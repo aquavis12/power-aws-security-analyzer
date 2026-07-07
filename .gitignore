@@ -1,0 +1,30 @@
+# Kiro local state (per-workspace, not shipped with the power)
+.kiro/
+
+# Scan output — reports are generated locally and may contain account data
+security-reports/
+*-security-report-*.json
+*-security-report-*.html
+security-report-*.json
+security-report-*.html
+
+# Filled-in context (copied from context-templates/ into the user's workspace)
+security-context/
+
+# Python caches (from any local validation)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# AWS credentials — never commit
+.aws/
+*credentials*

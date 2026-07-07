@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "aws-mcp": {
+      "command": "uvx",
+      "timeout": 100000,
+      "transport": "stdio",
+      "args": [
+        "mcp-proxy-for-aws==1.6.0",
+        "https://aws-mcp.us-east-1.api.aws/mcp",
+        "--metadata", "AWS_REGION=us-east-1"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "aws___call_aws",
+        "aws___run_script",
+        "aws___get_tasks",
+        "aws___list_regions",
+        "aws___get_regional_availability",
+        "aws___search_documentation",
+        "aws___read_documentation",
+        "aws___retrieve_skill",
+        "aws___recommend"
+      ]
+    }
+  }
+}

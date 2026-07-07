@@ -1,0 +1,7 @@
+{
+  "accountId": "AUTO_FROM_STS",
+  "regions": ["us-east-1"],
+  "outputDir": "./security-reports",
+  "trustedAdvisor": true,
+  "unusedRoleThresholdDays": 180
+}

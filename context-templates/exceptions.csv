@@ -1,0 +1,2 @@
+resource_arn,check_id,reason,owner,review_date
+arn:aws:s3:::example-public-static-site,PublicReadAccessBlock,Intentional public static website,platform-team,2026-12-31
