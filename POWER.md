@@ -1,14 +1,14 @@
 ---
 name: "aws-security-analyzer"
 displayName: "AWS Security Analyzer"
-description: "Run a consolidated AWS security posture scan from your IDE — Trusted Advisor security findings plus a comprehensive set of IAM, EC2/network, S3, RDS, KMS, Lambda, API Gateway, SNS, SQS, DynamoDB, CloudFront, ELB/ALB/NLB, Secrets Manager, WAF, VPC, OpenSearch, container (EKS/ECS/ECR), detective-control (GuardDuty/CloudTrail), IAM Access Analyzer external-access, and Compute Optimizer best-practice checks — enriched with Well-Architected Security Pillar guidance, IAM deep-analysis, and AWS Documentation references — powered by four MCP servers, emitting a consolidated JSON + HTML report."
-keywords: ["security", "security audit", "trusted advisor", "iam audit", "iam analysis", "ec2 security", "s3 public access", "imdsv2", "security group", "posture", "cspm", "container security", "guardduty", "cloudtrail", "access analyzer", "external access", "compute optimizer", "cost optimization", "lambda", "api gateway", "sns", "sqs", "dynamodb", "cloudfront", "elb", "alb", "waf", "secrets manager", "opensearch", "vpc", "well-architected", "security pillar", "compliance"]
+description: "Run a consolidated AWS security posture scan from your IDE — Trusted Advisor security findings plus a comprehensive set of IAM, EC2/network, S3, RDS, KMS, Lambda, API Gateway, SNS, SQS, DynamoDB, CloudFront, ELB/ALB/NLB, Secrets Manager, WAF, VPC, OpenSearch, container (EKS/ECS/ECR), detective-control (GuardDuty/CloudTrail), IAM Access Analyzer external-access, and Compute Optimizer best-practice checks — enriched with Well-Architected Security Pillar guidance, IAM deep-analysis, and AWS Documentation references — powered by four MCP servers, emitting a consolidated Markdown + HTML report."
+keywords: ["security", "security audit", "trusted advisor", "iam audit", "iam analysis", "ec2 security", "s3 public access", "imdsv2", "security group", "posture", "cspm", "container security", "guardduty", "cloudtrail", "access analyzer", "external access", "compute optimizer", "cost optimization", "lambda", "api gateway", "sns", "sqs", "dynamodb", "cloudfront", "elb", "alb", "waf", "secrets manager", "opensearch", "vpc", "well-architected", "security pillar", "compliance", "cis benchmark", "hipaa", "soc2", "pci dss", "fsbp"]
 author: "Venkata Pavan Vishnu Rachapudi"
 ---
 
 # AWS Security Analyzer Power
 
-This power lets the Kiro agent run a **read-only AWS security posture scan** through **four MCP servers**. It pulls **Trusted Advisor** flagged security checks once, then runs a comprehensive set of best-practice checks across **IAM / EC2 / network / S3 / RDS / KMS / Lambda / API Gateway / SNS / SQS / DynamoDB / CloudFront / ELB-ALB-NLB / Secrets Manager / WAF / VPC / OpenSearch**, **EKS / ECS / ECR** container-security checks, **IAM Access Analyzer** external-access findings, **Compute Optimizer** enrollment and over-provisioned resource detection, plus **GuardDuty & CloudTrail** detective-control checks — all enriched with **Well-Architected Security Pillar** guidance, deep **IAM policy analysis**, and **AWS Documentation** references — and writes a **consolidated JSON + HTML report** to a local path.
+This power lets the Kiro agent run a **read-only AWS security posture scan** through **four MCP servers**. It pulls **Trusted Advisor** flagged security checks once, then runs a comprehensive set of best-practice checks across **IAM / EC2 / network / S3 / RDS / KMS / Lambda / API Gateway / SNS / SQS / DynamoDB / CloudFront / ELB-ALB-NLB / Secrets Manager / WAF / VPC / OpenSearch**, **EKS / ECS / ECR** container-security checks, **IAM Access Analyzer** external-access findings, **Compute Optimizer** enrollment and over-provisioned resource detection, plus **GuardDuty & CloudTrail** detective-control checks — all enriched with **Well-Architected Security Pillar** guidance, deep **IAM policy analysis**, and **AWS Documentation** references — and writes a **consolidated Markdown + HTML report** to a local path.
 
 ## MCP Servers
 
@@ -73,7 +73,7 @@ Add `.kiro/hooks/run-security-scan.kiro.hook`:
   "when": { "type": "userTriggered" },
   "then": {
     "type": "askAgent",
-    "prompt": "Follow steering/scan-workflow.md: pull Trusted Advisor security findings once, run all checks in steering/checks-catalog.md against the regions in .kiro/security-analyzer.json, enrich with Well-Architected mappings and documentation links, then write the consolidated report per steering/report-output.md. Report the JSON and HTML paths."
+    "prompt": "Follow steering/scan-workflow.md: pull Trusted Advisor security findings once, run all checks in steering/checks-catalog.md against the regions in .kiro/security-analyzer.json, enrich with Well-Architected mappings and documentation links, then write the consolidated report per steering/report-output.md. Report the Markdown and HTML paths."
   }
 }
 ```
@@ -81,7 +81,7 @@ Add `.kiro/hooks/run-security-scan.kiro.hook`:
 # When to Load Steering Files
 - Running the end-to-end scan (phases, TA pull, polling) → `steering/scan-workflow.md`
 - The full check catalog with check IDs, severity, and how to evaluate each → `steering/checks-catalog.md`
-- Building the consolidated JSON + HTML report and where to write it → `steering/report-output.md`
+- Building the consolidated Markdown + HTML report and where to write it → `steering/report-output.md`
 
 # When to Use Skills
 - Full scan → `skills/scan/SKILL.md`

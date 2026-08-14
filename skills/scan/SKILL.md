@@ -37,7 +37,7 @@ description: Run the full end-to-end security posture scan — Trusted Advisor, 
 - Use `aws-documentation-mcp-server` to attach relevant AWS documentation links to recommendations.
 
 ## Step 5: Produce the report
-- Follow `steering/report-output.md` to write both JSON and HTML files to `outputDir`.
+- Follow `steering/report-output.md` to write both Markdown and HTML files to `outputDir`.
 - Print the absolute paths and offer to open the HTML.
 
 ## Step 6: Summary

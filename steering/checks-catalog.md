@@ -276,6 +276,123 @@ Account-level identity and governance foundations aligned to the AWS Well-Archit
 
 ---
 
+## Compliance Framework Mappings
+
+Every check in this catalog maps to one or more industry compliance benchmarks. The mapping allows the report to show which frameworks a finding violates. Use the compliance tags in the report output alongside the check ID and severity.
+
+### CIS AWS Foundations Benchmark v3.0
+
+| Check ID(s) | CIS Control | CIS Section |
+|-------------|-------------|-------------|
+| `rootMfaActive` | Ensure MFA is enabled for the root account | 1.5 |
+| `mfaActive` | Ensure MFA is enabled for all IAM users with console access | 1.10 |
+| `rootHasAccessKey` | Ensure no root account access key exists | 1.4 |
+| `hasAccessKeyNoRotate90days` | Ensure access keys are rotated every 90 days or less | 1.14 |
+| `userNoActivity90days` | Ensure credentials unused for 90 days are disabled | 1.12 |
+| `passwordPolicy`, `passwordPolicyLength` | Ensure IAM password policy requires minimum length of 14 | 1.8 |
+| `passwordPolicyReuse` | Ensure IAM password policy prevents password reuse | 1.9 |
+| `wildcardActionsDetection` | Ensure IAM policies that allow full "*:*" administrative privileges are not attached | 1.16 |
+| `NeedToEnableCloudTrail`, `EnableCloudTrailLogging` | Ensure CloudTrail is enabled in all regions | 3.1 |
+| `HasOneMultiRegionTrail` | Ensure CloudTrail trails are integrated with CloudWatch Logs | 3.4 |
+| `LogFileValidationEnabled` | Ensure CloudTrail log file validation is enabled | 3.2 |
+| `EnableTrailS3BucketLogging` | Ensure S3 bucket access logging is enabled on the CloudTrail S3 bucket | 3.6 |
+| `VpcNoFlowLogs` | Ensure VPC Flow Logging is enabled in all VPCs | 3.9 |
+| `SGAllPortOpenToAll`, `SGSensitivePortOpenToAll` | Ensure no security groups allow ingress from 0.0.0.0/0 to remote admin ports | 5.2, 5.3 |
+| `S3AccountPublicAccessBlock` | Ensure S3 buckets are configured with Block Public Access | 2.1.4 |
+| `ServerSideEncrypted` | Ensure S3 bucket server-side encryption is enabled | 2.1.1 |
+| `KeyRotationEnabled` | Ensure rotation for customer-managed CMKs is enabled | 3.8 |
+| `IamAccessAnalyzerEnabled` | Ensure IAM Access Analyzer is enabled for all regions | 1.20 |
+| `DefaultVpcInUse` | Ensure the default security group of every VPC restricts all traffic | 5.4 |
+| `EnableConfigService` | Ensure AWS Config is enabled in all regions | 3.5 |
+| `rootConsoleLogin30days` | Ensure use of root account is monitored/minimized | 1.7 |
+| `EC2IMDSv2` | Ensure EC2 instances use IMDSv2 | 5.6 |
+| `StorageEncrypted` | Ensure RDS instances have encryption at rest enabled | 2.3.1 |
+
+### HIPAA (Health Insurance Portability and Accountability Act)
+
+| Check ID(s) | HIPAA Safeguard | Reference |
+|-------------|-----------------|-----------|
+| `mfaActive`, `rootMfaActive` | Access Control — Unique User Identification + MFA | §164.312(d) |
+| `hasAccessKeyNoRotate90days` | Access Control — Automatic Logoff / credential management | §164.312(a)(2)(iii) |
+| `userNoActivity90days` | Workforce Security — Termination procedures | §164.308(a)(3)(ii)(C) |
+| `ServerSideEncrypted`, `SSEWithKMS`, `StorageEncrypted` | Encryption at rest — ePHI protection | §164.312(a)(2)(iv) |
+| `TlsEnforced`, `AlbInsecureTls`, `CloudFrontNoHttpsOnly` | Encryption in transit — ePHI transmission security | §164.312(e)(1) |
+| `NeedToEnableCloudTrail`, `EnableCloudTrailLogging` | Audit Controls — information system activity review | §164.312(b) |
+| `Findings`, `Settings` | Integrity Controls — mechanism to detect unauthorized alteration | §164.312(c)(2) |
+| `PubliclyAccessible`, `SnsTopicPublicAccess`, `SqsQueuePublicAccess` | Access Control — minimum necessary access to ePHI | §164.502(b) |
+| `DeleteProtection`, `Backup`, `DynamoDbNoPitr` | Contingency Plan — data backup and disaster recovery | §164.308(a)(7) |
+| `VpcNoFlowLogs`, `ElbNoAccessLogs` | Audit Controls — activity logging and monitoring | §164.312(b) |
+| `SecretsManagerNoRotation` | Access Control — credential management | §164.312(a)(1) |
+| `WafNoRules`, `ApiGwNoAuthorizer` | Access Control — prevent unauthorized access | §164.312(a)(1) |
+| `LambdaPublicAccess`, `LambdaFunctionUrlNoAuth` | Access Control — restrict public access to compute | §164.312(a)(1) |
+
+### SOC 2 Type II (Trust Services Criteria)
+
+| Check ID(s) | SOC 2 Criteria | Category |
+|-------------|----------------|----------|
+| `mfaActive`, `rootMfaActive` | CC6.1 — Logical and physical access controls | Security |
+| `hasAccessKeyNoRotate90days` | CC6.2 — Credentials are managed prior to access | Security |
+| `userNoActivity90days`, `unusedRole` | CC6.3 — Access is removed when no longer needed | Security |
+| `NeedToEnableCloudTrail`, `VpcNoFlowLogs` | CC7.1 — Detection of unauthorized activities | Security |
+| `Findings` | CC7.2 — Monitoring of anomalies for incident response | Security |
+| `ServerSideEncrypted`, `StorageEncrypted`, `SqsQueueNotEncrypted` | CC6.7 — Restrict access to information assets in transit/rest | Confidentiality |
+| `DeleteProtection`, `Backup`, `DynamoDbNoPitr` | A1.2 — Recovery of infrastructure/data | Availability |
+| `SGAllPortOpenToAll`, `LambdaPublicAccess` | CC6.6 — Restrict external access | Security |
+| `wildcardActionsDetection` | CC6.3 — Least privilege access | Security |
+| `CloudFrontNoHttpsOnly`, `TlsEnforced` | CC6.7 — Protection of data in transit | Confidentiality |
+
+### PCI DSS v4.0
+
+| Check ID(s) | PCI DSS Requirement | Section |
+|-------------|---------------------|---------|
+| `SGAllPortOpenToAll`, `SGSensitivePortOpenToAll` | Restrict inbound/outbound traffic to that which is necessary | 1.3 |
+| `CloudFrontNoHttpsOnly`, `TlsEnforced`, `AlbInsecureTls` | Encrypt transmission of cardholder data across open networks | 4.1 |
+| `ServerSideEncrypted`, `StorageEncrypted`, `DynamoDbNoCmkEncryption` | Protect stored cardholder data with encryption | 3.5 |
+| `mfaActive`, `rootMfaActive` | Multi-factor authentication for access to CDE | 8.3 |
+| `hasAccessKeyNoRotate90days` | Passwords/passphrases changed at least once every 90 days | 8.3.9 |
+| `NeedToEnableCloudTrail`, `VpcNoFlowLogs`, `ElbNoAccessLogs` | Audit trail — record all access to system components | 10.1, 10.2 |
+| `Findings`, `Settings` | Regularly test security systems and processes | 11.4 |
+| `WafNoRules`, `ApiGwNoAuthorizer` | Protect web-facing applications | 6.4 |
+| `LambdaPublicAccess`, `PubliclyAccessible` | Restrict public access to system components | 1.4 |
+| `SecretsManagerNoRotation`, `LambdaEnvSecrets`, `EcsSecretsInEnv` | Do not store sensitive authentication data after authorization | 3.2 |
+| `KeyRotationEnabled` | Cryptographic key management procedures | 3.6 |
+
+### AWS Foundational Security Best Practices (FSBP)
+
+| Check ID(s) | FSBP Control | AWS Service |
+|-------------|--------------|-------------|
+| `EC2IMDSv2` | EC2.8 — IMDSv2 should be configured | EC2 |
+| `SGAllPortOpenToAll` | EC2.19 — Security groups should not allow unrestricted ingress | EC2 |
+| `S3AccountPublicAccessBlock` | S3.1 — S3 Block Public Access setting should be enabled | S3 |
+| `ServerSideEncrypted` | S3.4 — S3 buckets should have server-side encryption enabled | S3 |
+| `StorageEncrypted` | RDS.3 — RDS DB instances should have encryption at rest enabled | RDS |
+| `DeleteProtection` | RDS.8 — RDS DB instances should have deletion protection enabled | RDS |
+| `PubliclyAccessible` | RDS.2 — RDS DB instances should prohibit public access | RDS |
+| `KeyRotationEnabled` | KMS.4 — AWS KMS key rotation should be enabled | KMS |
+| `NeedToEnableCloudTrail` | CloudTrail.1 — CloudTrail should be enabled | CloudTrail |
+| `HasOneMultiRegionTrail` | CloudTrail.5 — CloudTrail trails should be multi-region | CloudTrail |
+| `Findings` | GuardDuty.1 — GuardDuty should be enabled | GuardDuty |
+| `LambdaPublicAccess` | Lambda.1 — Lambda function policies should prohibit public access | Lambda |
+| `LambdaDeprecatedRuntime` | Lambda.2 — Lambda functions should use supported runtimes | Lambda |
+| `EcrScanOnPush` | ECR.1 — ECR repositories should have image scanning enabled | ECR |
+| `eksEndpointPublicAccess` | EKS.1 — EKS cluster endpoints should not be publicly accessible | EKS |
+| `eksSecretsEncryption` | EKS.2 — EKS clusters should use encrypted secrets | EKS |
+| `CloudFrontNoHttpsOnly` | CloudFront.3 — CloudFront distributions should require HTTPS | CloudFront |
+| `ElbNoAccessLogs` | ELB.5 — Application and Classic LBs logging should be enabled | ELB |
+| `AlbInsecureTls` | ELB.8 — Classic LBs with SSL listeners should use a predefined security policy with strong TLS | ELB |
+| `OpenSearchPublicAccess` | ES.2 — OpenSearch domains should not be publicly accessible | OpenSearch |
+| `OpenSearchNoEncryption` | ES.1 — OpenSearch domains should have encryption at rest enabled | OpenSearch |
+| `SqsQueueNotEncrypted` | SQS.1 — SQS queues should be encrypted at rest | SQS |
+| `SnsTopicNotEncrypted` | SNS.1 — SNS topics should be encrypted at rest | SNS |
+| `DynamoDbNoPitr` | DynamoDB.2 — DynamoDB tables should have PITR enabled | DynamoDB |
+| `WafNoLogging` | WAF.1 — AWS WAF Classic global web ACL logging should be enabled | WAF |
+| `SecretsManagerNoRotation` | SecretsManager.1 — Secrets Manager secrets should have rotation enabled | Secrets Manager |
+| `VpcNoFlowLogs` | EC2.6 — VPC flow logging should be enabled in all VPCs | VPC |
+| `IamAccessAnalyzerEnabled` | IAM.8 — IAM Access Analyzer should be enabled | IAM |
+| `ComputeOptimizerNotEnabled` | Account.1 — AWS Compute Optimizer should be enabled | Account |
+
+---
+
 ## Scoring
 
 - **FAIL** = misconfiguration present (counts toward the risk total, weighted by severity: H=3, M=2, L=1).
