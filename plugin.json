@@ -1,4 +1,5 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aws-security-analyzer",
   "version": "3.0.0",
   "description": "Run a consolidated AWS security posture scan from your IDE — Trusted Advisor security findings plus a comprehensive set of IAM, EC2/network, S3, RDS, KMS, Lambda, API Gateway, SNS, SQS, DynamoDB, CloudFront, ELB/ALB/NLB, Secrets Manager, WAF, VPC, OpenSearch, container (EKS/ECS/ECR), detective-control (GuardDuty/CloudTrail), IAM Access Analyzer external-access, and Compute Optimizer best-practice checks — enriched with Well-Architected Security Pillar guidance, IAM deep-analysis, and AWS Documentation references — powered by four MCP servers, emitting a consolidated Markdown + HTML report.",

@@ -123,3 +123,10 @@ power-aws-security-analyzer/
 ## License
 
 [MIT](LICENSE) © 2026 Venkata Pavan Vishnu Rachapudi
+
+---
+
+## Privacy & Support
+
+- **Privacy Policy**: [AWS Privacy Notice](https://aws.amazon.com/privacy/)
+- **Support**: [GitHub Issues](https://github.com/aquavis12/power-aws-security-analyzer/issues) or rachapudivishnu9@gmail.com
