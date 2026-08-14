@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="assets/hero.png" alt="AWS Security Analyzer — Kiro Power" width="100%">
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hero-orbital-dark.png">
+  <img src="assets/hero-orbital-light.png" alt="AWS Security Analyzer — Kiro Power" width="100%">
+</picture>
 
 <h1 align="center">AWS Security Analyzer</h1>
 
