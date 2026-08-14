@@ -47,7 +47,78 @@ For EACH region in scope:
 2. ECR: `describe-repositories` + `get-repository-policy` (scan-on-push, tag immutability, wildcard policy). Run catalog checks 36-38.
 3. ECS: `list-task-definitions` -> `describe-task-definition` and `describe-services` (privileged/host mode, plaintext secrets, public IP). Run catalog checks 39-41.
 
-## Phase 9 - Consolidate
+## Phase 9 — Lambda (per region)
+For EACH region in scope:
+1. `lambda:ListFunctions` (page through all); for each function: `get-function`, `get-policy` (resource-based policy), `list-function-url-configs`.
+2. Inspect runtime, VPC config, environment variables, tracing, code-signing config, reserved concurrency.
+3. Run catalog checks 53–60: public access, deprecated runtime, no VPC, env secrets, reserved concurrency, function URL auth, code signing, tracing.
+
+## Phase 10 — API Gateway (per region)
+For EACH region in scope:
+1. REST APIs: `get-rest-apis` → `get-resources` → `get-method`; inspect authorizer, stage settings.
+2. HTTP APIs: `get-apis` → `get-routes` → `get-stages`; inspect authorization, logging.
+3. `wafv2:GetWebACLForResource` on stage ARNs.
+4. Run catalog checks 61–67: no authorizer, no WAF, logging disabled, no throttling, mutual TLS, client cert, edge endpoint.
+
+## Phase 11 — SNS / SQS (per region)
+For EACH region in scope:
+1. SNS: `list-topics` → `get-topic-attributes` (policy, encryption, delivery logging).
+2. SQS: `list-queues` → `get-queue-attributes` (policy, encryption, DLQ).
+3. Run catalog checks 68–73: public access, encryption, delivery logging, DLQ.
+
+## Phase 12 — DynamoDB (per region)
+For EACH region in scope:
+1. `list-tables` → `describe-table`, `describe-continuous-backups`.
+2. Check encryption type, PITR, deletion protection, auto-scaling policies.
+3. Run catalog checks 74–77.
+
+## Phase 13 — CloudFront (global)
+1. `list-distributions` → `get-distribution` per distribution.
+2. Inspect viewer protocol, WAF, certificate, logging, origin access, TLS version, geo-restriction.
+3. Run catalog checks 78–84.
+
+## Phase 14 — ELB / ALB / NLB (per region)
+For EACH region in scope:
+1. `describe-load-balancers` (v2: ALB/NLB), `describe-load-balancers` (classic).
+2. `describe-load-balancer-attributes`, `describe-listeners`, `describe-ssl-policies`.
+3. `wafv2:GetWebACLForResource` on ALB ARNs.
+4. Run catalog checks 85–91: access logs, WAF, deletion protection, TLS policy, HTTP redirect, classic LB, cross-zone.
+
+## Phase 15 — Secrets Manager (per region)
+For EACH region in scope:
+1. `list-secrets` (page through all); inspect rotation config, KMS key, last accessed date.
+2. Run catalog checks 92–94: no rotation, no CMK, stale secrets.
+
+## Phase 16 — WAF (per region + global CloudFront scope)
+1. `wafv2:ListWebACLs` (REGIONAL scope per region, CLOUDFRONT scope in us-east-1).
+2. Per ACL: `get-web-acl` (rules count, rate-based rules), `get-logging-configuration`.
+3. Run catalog checks 95–97: no rules, no logging, no rate-limit.
+
+## Phase 17 — VPC & Networking (per region)
+For EACH region in scope:
+1. `describe-vpcs`, `describe-flow-logs`, `describe-vpc-endpoints`.
+2. Check for flow logs per VPC, default VPC usage (ENIs attached), gateway endpoints.
+3. Run catalog checks 98–100.
+
+## Phase 18 — OpenSearch (per region)
+For EACH region in scope:
+1. `es:ListDomainNames` → `es:DescribeDomain` per domain.
+2. Inspect VPC config, access policy, encryption at rest, node-to-node encryption, audit logs.
+3. Run catalog checks 101–104.
+
+## Phase 19 — IAM Access Analyzer External Access (per region)
+For EACH region in scope:
+1. `accessanalyzer:ListAnalyzers` — identify ACCOUNT and ORGANIZATION-level analyzers; also check for UNUSED_ACCESS type analyzers.
+2. For each active analyzer, `accessanalyzer:ListFindings` with filter `status=ACTIVE`.
+3. Run catalog checks 49–50: external-access findings (FAIL per active finding), unused-access findings (WARN per active finding).
+4. If no analyzer exists, check 48 already flags it — skip findings retrieval for that region.
+
+## Phase 20 — Compute Optimizer (global)
+1. `compute-optimizer:GetEnrollmentStatus` — confirm whether Compute Optimizer is active for the account. If denied, mark `computeOptimizer: "unavailable"` and continue.
+2. If enrolled (`status=Active`), call `compute-optimizer:GetEC2InstanceRecommendations` (page through results); optionally `GetAutoScalingGroupRecommendations`.
+3. Run catalog checks 51–52: enrollment status (FAIL if not active), over-provisioned resources (WARN per resource with `OVER_PROVISIONED` finding).
+
+## Phase 21 - Consolidate
 1. Score every finding PASS/WARN/FAIL with check ID + severity.
 2. **Apply accepted-risk exceptions**: for each FAIL, if a row in the exceptions list matches on BOTH `check_id` AND `resource_arn` (exact, or the resource identifier is contained in the ARN), downgrade its status to `PASS (accepted)` and attach the row's `reason` + `owner`. An expired `review_date` (before today) does NOT auto-suppress — keep it as FAIL and add an `exceptionExpired` note so stale acceptances resurface.
 3. Recompute the summary so `PASS (accepted)` findings are excluded from the risk score (see `steering/report-output.md`).

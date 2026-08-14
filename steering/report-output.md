@@ -43,7 +43,7 @@ Filenames: `security-report-<accountId>-<YYYYMMDD-HHMM>.json` and `.html`.
 Self-contained (inline CSS, no external assets) so it opens offline. Include:
 1. **Header** — account, regions, timestamp, TA availability.
 2. **Summary cards** — total FAIL / WARN / PASS and risk score; severity breakdown (H/M/L).
-3. **Findings table** — grouped by category (IAM → EC2/Network → S3 → Trusted Advisor), sorted by severity then status. Columns: Check, Severity, Status, Region, Resource, Evidence, Recommendation. Color rows: FAIL red, WARN amber, PASS green, `PASS (accepted)` grey with the acceptance reason/owner shown in the Evidence column.
+3. **Findings table** — grouped by category (IAM → EC2/Network → S3 → RDS → KMS → Lambda → API Gateway → SNS/SQS → DynamoDB → CloudFront → ELB/ALB → Secrets Manager → WAF → VPC → OpenSearch → Containers → Detective Controls → Access Analyzer → Compute Optimizer → Trusted Advisor), sorted by severity then status. Columns: Check, Severity, Status, Region, Resource, Evidence, Recommendation. Color rows: FAIL red, WARN amber, PASS green, `PASS (accepted)` grey with the acceptance reason/owner shown in the Evidence column.
 4. **Footer** — note the scan is read-only and lists the check catalog version.
 
 ## Writing the files

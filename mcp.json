@@ -24,6 +24,75 @@
         "aws___retrieve_skill",
         "aws___recommend"
       ]
+    },
+    "iam-mcp-server": {
+      "command": "uvx",
+      "timeout": 60000,
+      "transport": "stdio",
+      "args": [
+        "awslabs.iam-mcp-server@latest",
+        "--readonly"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_users",
+        "get_user",
+        "list_roles",
+        "list_policies",
+        "list_groups",
+        "get_group",
+        "simulate_principal_policy",
+        "list_user_policies",
+        "list_role_policies",
+        "get_user_policy",
+        "get_role_policy"
+      ]
+    },
+    "well-architected-security-mcp-server": {
+      "command": "uvx",
+      "timeout": 120000,
+      "transport": "stdio",
+      "args": [
+        "--from", "awslabs.well-architected-security-mcp-server",
+        "well-architected-security-mcp-server"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "CheckSecurityServices",
+        "GetSecurityFindings",
+        "GetResourceComplianceStatus",
+        "GetStoredSecurityContext",
+        "ExploreAwsResources",
+        "AnalyzeSecurityPosture"
+      ]
+    },
+    "aws-documentation-mcp-server": {
+      "command": "uvx",
+      "timeout": 60000,
+      "transport": "stdio",
+      "args": [
+        "awslabs.aws-documentation-mcp-server@latest"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_DOCUMENTATION_PARTITION": "aws"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "read_documentation",
+        "search_documentation",
+        "read_sections",
+        "search_table",
+        "recommend"
+      ]
     }
   }
 }
