@@ -120,11 +120,12 @@ For EACH region in scope:
 
 ## Phase 21 - Consolidate
 1. Score every finding PASS/WARN/FAIL with check ID + severity.
-2. **Map compliance frameworks**: for each finding, look up the check ID in `steering/checks-catalog.md` § "Compliance Framework Mappings" and attach all matching framework references (CIS, HIPAA, SOC2, PCI DSS, FSBP).
-3. **Compute compliance posture**: calculate per-framework pass rates (total mapped controls that are PASS / total mapped controls).
-4. **Apply accepted-risk exceptions**: for each FAIL, if a row in the exceptions list matches on BOTH `check_id` AND `resource_arn` (exact, or the resource identifier is contained in the ARN), downgrade its status to `PASS (accepted)` and attach the row's `reason` + `owner`. An expired `review_date` (before today) does NOT auto-suppress — keep it as FAIL and add an `exceptionExpired` note so stale acceptances resurface.
-5. Recompute the summary so `PASS (accepted)` findings are excluded from the risk score (see `steering/report-output.md`).
-6. Hand off to `steering/report-output.md` to write Markdown + HTML to `outputDir`.
+2. **Validate resource identifiers**: For every finding, ensure `resourceArn`, `resourceName`, and `resourceId` are populated. Construct ARNs where APIs only return IDs (e.g., `arn:aws:ec2:<region>:<accountId>:security-group/<sg-id>`). Resolve Name tags where available.
+3. **Map compliance frameworks**: for each finding, look up the check ID in `steering/checks-catalog.md` § "Compliance Framework Mappings" and attach all matching framework references (CIS, HIPAA, SOC2, PCI DSS, FSBP).
+4. **Compute compliance posture**: calculate per-framework pass rates (total mapped controls that are PASS / total mapped controls).
+5. **Apply accepted-risk exceptions**: for each FAIL, if a row in the exceptions list matches on BOTH `check_id` AND `resource_arn` (exact, or the resource identifier is contained in the ARN), downgrade its status to `PASS (accepted)` and attach the row's `reason` + `owner`. An expired `review_date` (before today) does NOT auto-suppress — keep it as FAIL and add an `exceptionExpired` note so stale acceptances resurface.
+6. Recompute the summary so `PASS (accepted)` findings are excluded from the risk score (see `steering/report-output.md`).
+7. Hand off to `steering/report-output.md` to write Markdown + HTML to `outputDir`.
 
 ## Hygiene
 - Page through ALL results before scoring (don't stop at the first page).

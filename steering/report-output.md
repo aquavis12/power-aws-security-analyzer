@@ -34,9 +34,19 @@ The `.md` file is the source of truth — version-controllable, readable in any 
 
 ## Findings — [Category Name]
 
-| Check | ID | Sev | Status | Region | Resource | Evidence | Recommendation | Compliance | WAF Mapping | Docs |
-|-------|-----|-----|--------|--------|----------|----------|----------------|------------|-------------|------|
+| Check | ID | Sev | Status | Region | Resource ARN | Resource Name | Resource ID | Evidence | Recommendation | Compliance | WAF Mapping | Docs |
+|-------|-----|-----|--------|--------|--------------|---------------|-------------|----------|----------------|------------|-------------|------|
 ```
+
+### Resource identification columns
+Every finding MUST include these three resource-identity columns:
+- **Resource ARN**: Full Amazon Resource Name (e.g., `arn:aws:ec2:us-east-1:123456789012:security-group/sg-0abc123`). For account-level findings use `arn:aws:iam::<accountId>:root`.
+- **Resource Name**: Human-friendly name — Name tag, bucket name, function name, role name, cluster name, etc. Falls back to resource ID if no name exists.
+- **Resource ID**: AWS-assigned unique identifier — `sg-0abc123`, `i-0def456`, `AKIAIOSFODNN7EXAMPLE`, etc. For account-level findings use the account ID.
+
+When a single check flags multiple resources, either:
+- List one row per resource (preferred for ≤5 resources), OR
+- Combine in a single row with comma-separated values in each column (for >5 resources, truncate at 10 and note "… and N more").
 
 ### Compliance column
 Each finding includes a `Compliance` field listing all frameworks violated (comma-separated):
@@ -75,7 +85,7 @@ Self-contained (inline CSS, no external assets) so it opens offline in any brows
    - SOC 2: X/Y criteria passing (Z%)
    - PCI DSS v4.0: X/Y requirements passing (Z%)
    - AWS FSBP: X/Y controls passing (Z%)
-3. **Findings tables** — grouped by category (same order as Markdown), sorted by severity then status. Columns: Check, ID, Severity, Status, Region, Resource, Evidence, Recommendation, Compliance (CIS/HIPAA/SOC2/PCI/FSBP tags), WAF Mapping, Docs Link. Row colors: FAIL=red, WARN=amber, PASS=green, `PASS (accepted)`=grey with acceptance reason/owner shown in Evidence column.
+3. **Findings tables** — grouped by category (same order as Markdown), sorted by severity then status. Columns: Check, ID, Severity, Status, Region, Resource ARN, Resource Name, Resource ID, Evidence, Recommendation, Compliance (CIS/HIPAA/SOC2/PCI/FSBP tags), WAF Mapping, Docs Link. Row colors: FAIL=red, WARN=amber, PASS=green, `PASS (accepted)`=grey with acceptance reason/owner shown in Evidence column.
 4. **Accepted risks table** — separate section for suppressed findings.
 5. **Footer** — note the scan is read-only, check catalog version, power version.
 

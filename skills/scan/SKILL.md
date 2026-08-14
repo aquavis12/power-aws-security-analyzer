@@ -1,6 +1,6 @@
 ---
 name: scan
-description: Run the full end-to-end security posture scan — Trusted Advisor, IAM, EC2/network, S3, RDS, KMS, containers, detective controls, IAM Access Analyzer, Compute Optimizer — and produce the consolidated JSON + HTML report.
+description: Run the full end-to-end security posture scan — Trusted Advisor, IAM, EC2/network, S3, RDS, KMS, containers, detective controls, IAM Access Analyzer, Compute Optimizer — and produce the consolidated JSON + HTML report with full resource identification (ARN, Name, ID).
 ---
 
 # Full Security Posture Scan
@@ -17,7 +17,25 @@ description: Run the full end-to-end security posture scan — Trusted Advisor, 
   - Whether to include Trusted Advisor (requires Business/Enterprise Support)
 - Save scope to `.kiro/security-analyzer.json`.
 
-## Step 3: Execute the scan
+## Step 3: Resource identification requirements
+For EVERY finding, capture the following resource identifiers wherever the AWS API provides them:
+- **resourceArn**: The full ARN (e.g., `arn:aws:ec2:us-east-1:123456789012:security-group/sg-0abc123`). Construct it from API responses if not returned directly.
+- **resourceName**: The human-readable name (e.g., Name tag value, bucket name, function name, role name, cluster name).
+- **resourceId**: The AWS-assigned unique ID (e.g., `sg-0abc123`, `i-0def456`, `vol-789`, `AKIAIOSFODNN7EXAMPLE`).
+
+If an API does not return all three, populate what is available:
+- Security Groups: ARN (construct from region+account+sg-id), Name tag or GroupName, GroupId.
+- EC2 instances: ARN (construct), Name tag, InstanceId.
+- S3 buckets: ARN (`arn:aws:s3:::bucket-name`), bucket name, bucket name (same).
+- IAM users/roles: ARN (from API), UserName/RoleName, UserId/RoleId.
+- RDS instances: DBInstanceArn, DBInstanceIdentifier, DbiResourceId.
+- Lambda functions: FunctionArn, FunctionName, RevisionId.
+- KMS keys: KeyArn (from metadata), alias if any, KeyId.
+- EKS clusters: cluster ARN, cluster name, cluster name.
+- VPCs: ARN (construct), Name tag, VpcId.
+- For account-level findings: use `arn:aws:iam::<accountId>:root` as ARN, "Account" as name, accountId as ID.
+
+## Step 4: Execute the scan
 - Load `steering/scan-workflow.md` and execute all phases in order:
   1. Trusted Advisor (global, once)
   2. IAM & credentials (global)
@@ -31,16 +49,16 @@ description: Run the full end-to-end security posture scan — Trusted Advisor, 
   10. Compute Optimizer (global)
   11. Consolidate & score
 
-## Step 4: Enrich findings
+## Step 5: Enrich findings
 - Use `well-architected-security-mcp-server` to cross-reference findings against the Well-Architected Security Pillar. Attach WAF best-practice IDs to relevant findings.
 - Use `iam-mcp-server` (read-only) for deeper IAM analysis: simulate principal policies for over-permissive findings, retrieve inline policy documents.
 - Use `aws-documentation-mcp-server` to attach relevant AWS documentation links to recommendations.
 
-## Step 5: Produce the report
+## Step 6: Produce the report
 - Follow `steering/report-output.md` to write both Markdown and HTML files to `outputDir`.
 - Print the absolute paths and offer to open the HTML.
 
-## Step 6: Summary
+## Step 7: Summary
 - Present a brief summary to the user: total FAIL/WARN/PASS, risk score, top 5 critical findings, and the report file paths.
 
 ## Guardrails

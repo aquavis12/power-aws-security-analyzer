@@ -1,6 +1,6 @@
 ---
 name: report
-description: Generate or regenerate the consolidated security report (Markdown + HTML) from a previous scan's findings — with executive summary, per-service breakdown, severity scoring, Well-Architected mappings, and remediation recommendations enriched with AWS documentation links.
+description: Generate or regenerate the consolidated security report (Markdown + HTML) from a previous scan's findings — with executive summary, per-service breakdown, severity scoring, full resource identification (ARN, Name, ID), Well-Architected mappings, and remediation recommendations enriched with AWS documentation links.
 ---
 
 # Generate Security Report
@@ -16,17 +16,29 @@ description: Generate or regenerate the consolidated security report (Markdown +
 ## Step 3: Apply exception list
 - If `security-context/exceptions.csv` exists, apply accepted-risk suppression.
 - Downgrade matching findings to `PASS (accepted)` with reason and owner attached.
+- Match on `resource_arn` (full ARN match or resource ID contained in the ARN).
 - Flag expired exceptions (review_date before today) — keep as FAIL with note.
 
-## Step 4: Enrich with Well-Architected mappings
+## Step 4: Validate resource identifiers
+- For each finding, confirm the following fields are populated:
+  - **resourceArn**: Full ARN of the affected resource (e.g., `arn:aws:ec2:us-east-1:123456789012:security-group/sg-abc123`)
+  - **resourceName**: Human-readable name (Name tag, bucket name, function name, role name, etc.)
+  - **resourceId**: AWS-assigned unique identifier (sg-id, instance-id, key-id, etc.)
+- If a finding is missing any of these, attempt to reconstruct:
+  - ARN: Build from service, region, account ID, and resource ID using standard ARN format.
+  - Name: Use the Name tag if available; otherwise fall back to the resource identifier.
+  - ID: Extract from the ARN's resource segment if not stored separately.
+- For account-level findings (no specific resource): ARN=`arn:aws:iam::<accountId>:root`, Name="Account", ID=accountId.
+
+## Step 5: Enrich with Well-Architected mappings
 - For each FAIL/WARN finding, map to the relevant Well-Architected Security Pillar best-practice ID (SEC##-BP##) using `well-architected-security-mcp-server`.
 - Add WAF mapping as a field in the JSON output and as a column/badge in the HTML report.
 
-## Step 5: Enrich with documentation links
+## Step 6: Enrich with documentation links
 - Use `aws-documentation-mcp-server` to search for remediation documentation for the top findings.
 - Attach doc links to the `recommendation` field in each finding.
 
-## Step 6: Produce the report files
+## Step 7: Produce the report files
 Follow `steering/report-output.md`:
 
 ### Markdown report (.md)
@@ -44,7 +56,7 @@ Self-contained (inline CSS, no external assets), opens offline in any browser:
 5. **Accepted risks table** — separate section for suppressed findings with owner/reason/review date.
 6. **Footer** — scan metadata, check catalog version, power version.
 
-## Step 7: Write and present
+## Step 8: Write and present
 - Write both files to `outputDir` with naming: `security-report-<accountId>-<YYYYMMDD-HHMM>.md` and `.html`.
 - Print absolute paths and offer to open the HTML.
 
