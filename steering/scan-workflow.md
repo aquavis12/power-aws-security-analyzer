@@ -118,7 +118,61 @@ For EACH region in scope:
 2. If enrolled (`status=Active`), call `compute-optimizer:GetEC2InstanceRecommendations` (page through results); optionally `GetAutoScalingGroupRecommendations`.
 3. Run catalog checks 51–52: enrollment status (FAIL if not active), over-provisioned resources (WARN per resource with `OVER_PROVISIONED` finding).
 
-## Phase 21 - Consolidate
+## Phase 21 — EBS (per region)
+For EACH region in scope:
+1. `ec2:GetEbsEncryptionByDefault` — check account-level default encryption setting.
+2. `ec2:DescribeVolumes` (page through all) — check `Encrypted` flag and `State` (available = orphaned).
+3. `ec2:DescribeSnapshots` (owner=self) → `ec2:DescribeSnapshotAttribute` (createVolumePermission) for each — check public sharing.
+4. Run catalog checks 105–108.
+
+## Phase 22 — EFS (per region)
+For EACH region in scope:
+1. `efs:DescribeFileSystems` — check encryption, then `efs:DescribeBackupPolicy` per filesystem.
+2. `efs:DescribeMountTargets` per filesystem → inspect associated SGs for NFS (2049) open to 0.0.0.0/0.
+3. `efs:DescribeFileSystemPolicy` — check for wildcard principal access.
+4. Run catalog checks 109–112.
+
+## Phase 23 — ElastiCache (per region)
+For EACH region in scope:
+1. `elasticache:DescribeReplicationGroups` (Redis) — check transit/at-rest encryption, auth token.
+2. `elasticache:DescribeCacheClusters` (Memcached + Redis standalone) — check VPC subnet group.
+3. Run catalog checks 113–116.
+
+## Phase 24 — Redshift (per region)
+For EACH region in scope:
+1. `redshift:DescribeClusters` — check public access, encryption, snapshot retention.
+2. `redshift:DescribeLoggingStatus` per cluster — check audit logging.
+3. Inspect cluster parameter group for `require_ssl` setting.
+4. Run catalog checks 117–121.
+
+## Phase 25 — SageMaker (per region)
+For EACH region in scope:
+1. `sagemaker:ListNotebookInstances` → `sagemaker:DescribeNotebookInstance` — check internet access, encryption, root access.
+2. `sagemaker:ListEndpoints` → `sagemaker:DescribeEndpointConfig` — check VPC config.
+3. Run catalog checks 122–125.
+
+## Phase 26 — AMI (per region)
+For EACH region in scope:
+1. `ec2:DescribeImages` (owner=self) — list owned AMIs.
+2. `ec2:DescribeImageAttribute` (launchPermission) per AMI — check for public sharing.
+3. Check block device mappings for unencrypted snapshots.
+4. Run catalog checks 126–127.
+
+## Phase 27 — Inspector (per region)
+For EACH region in scope:
+1. `inspector2:BatchGetAccountStatus` — check if Inspector is enabled for EC2/ECR/Lambda.
+2. If enabled, `inspector2:ListFindings` (filter severity=CRITICAL/HIGH, state=ACTIVE) — surface active vulnerability findings.
+3. `inspector2:ListCoverageStatistics` — check ECR scan coverage.
+4. Run catalog checks 128–130.
+
+## Phase 28 — Security Hub (per region)
+For EACH region in scope:
+1. `securityhub:DescribeHub` — check if Security Hub is enabled.
+2. `securityhub:GetEnabledStandards` — check which standards are subscribed.
+3. `securityhub:GetFindings` (filter SeverityLabel=CRITICAL, WorkflowStatus=NEW/NOTIFIED) — surface unresolved critical findings.
+4. Run catalog checks 131–133.
+
+## Phase 29 - Consolidate
 1. Score every finding PASS/WARN/FAIL with check ID + severity.
 2. **Validate resource identifiers**: For every finding, ensure `resourceArn`, `resourceName`, and `resourceId` are populated. Construct ARNs where APIs only return IDs (e.g., `arn:aws:ec2:<region>:<accountId>:security-group/<sg-id>`). Resolve Name tags where available.
 3. **Map compliance frameworks**: for each finding, look up the check ID in `steering/checks-catalog.md` § "Compliance Framework Mappings" and attach all matching framework references (CIS, HIPAA, SOC2, PCI DSS, FSBP).

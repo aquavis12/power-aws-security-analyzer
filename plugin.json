@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aws-security-analyzer",
   "version": "3.0.0",
-  "description": "Run a consolidated AWS security posture scan from your IDE — Trusted Advisor security findings plus a comprehensive set of IAM, EC2/network, S3, RDS, KMS, Lambda, API Gateway, SNS, SQS, DynamoDB, CloudFront, ELB/ALB/NLB, Secrets Manager, WAF, VPC, OpenSearch, container (EKS/ECS/ECR), detective-control (GuardDuty/CloudTrail), IAM Access Analyzer external-access, and Compute Optimizer best-practice checks — enriched with Well-Architected Security Pillar guidance, IAM deep-analysis, and AWS Documentation references — powered by four MCP servers, emitting a consolidated Markdown + HTML report.",
+  "description": "Run a consolidated AWS security posture scan from your IDE — Trusted Advisor security findings plus 133 checks across IAM, EC2/network, EBS, S3, RDS, KMS, Lambda, API Gateway, SNS, SQS, DynamoDB, CloudFront, ELB/ALB/NLB, Secrets Manager, WAF, VPC, OpenSearch, EFS, ElastiCache, Redshift, SageMaker, AMI, container (EKS/ECS/ECR), detective-control (GuardDuty/CloudTrail), IAM Access Analyzer, Inspector, Security Hub, and Compute Optimizer — enriched with Well-Architected Security Pillar guidance, IAM deep-analysis, and AWS Documentation references — powered by four MCP servers, emitting a consolidated Markdown + HTML report with full resource identification (ARN, Name, ID).",
   "author": {
     "name": "Venkata Pavan Vishnu Rachapudi",
     "email": "rachapudivishnu9@gmail.com",
@@ -54,7 +54,16 @@
     "waf",
     "secrets manager",
     "opensearch",
-    "vpc"
+    "vpc",
+    "ebs",
+    "efs",
+    "elasticache",
+    "redshift",
+    "sagemaker",
+    "ami",
+    "inspector",
+    "security hub",
+    "vulnerability"
   ],
   "homepage": "https://github.com/aquavis12/power-aws-security-analyzer",
   "repository": "https://github.com/aquavis12/power-aws-security-analyzer",

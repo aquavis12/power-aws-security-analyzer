@@ -52,7 +52,7 @@ Self-contained (inline CSS, no external assets), opens offline in any browser:
 1. **Header** — account, regions, timestamp, TA availability, MCP servers used.
 2. **Executive summary cards** — FAIL/WARN/PASS counts, risk score, severity breakdown with color-coded cards.
 3. **Well-Architected coverage** — which SEC controls are covered vs. gaps.
-4. **Findings tables** — grouped by category (IAM → EC2/Network → S3 → RDS → KMS → Lambda → API Gateway → SNS/SQS → DynamoDB → CloudFront → ELB/ALB → Secrets Manager → WAF → VPC → OpenSearch → Containers → Detective Controls → Access Analyzer → Compute Optimizer → Trusted Advisor), sorted by severity then status. Row colors: red=FAIL, amber=WARN, green=PASS, grey=accepted.
+4. **Findings tables** — grouped by category (IAM → EC2/Network → EBS → S3 → RDS → KMS → Lambda → API Gateway → SNS/SQS → DynamoDB → CloudFront → ELB/ALB → Secrets Manager → WAF → VPC → OpenSearch → EFS → ElastiCache → Redshift → SageMaker → AMI → Containers → Detective Controls → Access Analyzer → Inspector → Security Hub → Compute Optimizer → Trusted Advisor), sorted by severity then status. Row colors: red=FAIL, amber=WARN, green=PASS, grey=accepted.
 5. **Accepted risks table** — separate section for suppressed findings with owner/reason/review date.
 6. **Footer** — scan metadata, check catalog version, power version.
 

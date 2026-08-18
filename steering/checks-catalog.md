@@ -393,6 +393,150 @@ Every check in this catalog maps to one or more industry compliance benchmarks. 
 
 ---
 
+## EBS checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 105 | EBS volume not encrypted | `EbsVolumeNotEncrypted` | M | `ec2:DescribeVolumes`; FAIL volumes with `Encrypted=false`. |
+| 106 | EBS default encryption disabled | `EbsDefaultEncryptionDisabled` | M | `ec2:GetEbsEncryptionByDefault`; FAIL if account-level default EBS encryption is not enabled in the region. |
+| 107 | EBS public snapshot | `EbsSnapshotPublic` | H | `ec2:DescribeSnapshotAttribute` (createVolumePermission); FAIL snapshots shared with `all` (public). |
+| 108 | EBS volume not attached (orphaned) | `EbsVolumeOrphaned` | L | `ec2:DescribeVolumes`; WARN volumes with `State=available` (not attached to any instance — potential waste + data exposure). |
+
+---
+
+## EFS checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 109 | EFS not encrypted at rest | `EfsNotEncrypted` | M | `efs:DescribeFileSystems`; FAIL if `Encrypted=false`. |
+| 110 | EFS public mount target | `EfsPublicMountTarget` | H | `efs:DescribeMountTargets` → inspect associated security groups; FAIL if SG allows 0.0.0.0/0 on port 2049 (NFS). |
+| 111 | EFS no backup policy | `EfsNoBackupPolicy` | L | `efs:DescribeBackupPolicy`; WARN if `Status` ≠ `ENABLED`. |
+| 112 | EFS file system policy public access | `EfsPublicPolicy` | H | `efs:DescribeFileSystemPolicy`; FAIL if policy allows `Principal:"*"` without conditions. |
+
+---
+
+## ElastiCache checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 113 | ElastiCache cluster no encryption in transit | `ElastiCacheNoTransitEncryption` | H | `elasticache:DescribeReplicationGroups` / `DescribeCacheClusters`; FAIL if `TransitEncryptionEnabled=false`. |
+| 114 | ElastiCache cluster no encryption at rest | `ElastiCacheNoAtRestEncryption` | M | FAIL if `AtRestEncryptionEnabled=false`. |
+| 115 | ElastiCache no auth token | `ElastiCacheNoAuth` | H | FAIL Redis replication groups with `AuthTokenEnabled=false` (unauthenticated access). |
+| 116 | ElastiCache cluster not in VPC | `ElastiCacheNoVpc` | M | WARN if cache cluster is not associated with a VPC subnet group (legacy EC2-Classic or default placement). |
+
+---
+
+## Redshift checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 117 | Redshift cluster publicly accessible | `RedshiftPublicAccess` | H | `redshift:DescribeClusters`; FAIL if `PubliclyAccessible=true`. |
+| 118 | Redshift cluster not encrypted | `RedshiftNotEncrypted` | M | FAIL if `Encrypted=false`. |
+| 119 | Redshift audit logging disabled | `RedshiftNoAuditLogging` | M | `redshift:DescribeLoggingStatus`; FAIL if `LoggingEnabled=false`. |
+| 120 | Redshift no automated snapshots | `RedshiftNoSnapshots` | M | FAIL if `AutomatedSnapshotRetentionPeriod=0`. |
+| 121 | Redshift parameter require SSL | `RedshiftNoRequireSsl` | H | Inspect cluster parameter group for `require_ssl=true`; FAIL if SSL not required. |
+
+---
+
+## SageMaker checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 122 | SageMaker notebook publicly accessible | `SageMakerNotebookPublic` | H | `sagemaker:ListNotebookInstances` → `DescribeNotebookInstance`; FAIL if `DirectInternetAccess=Enabled`. |
+| 123 | SageMaker notebook not encrypted | `SageMakerNotebookNotEncrypted` | M | FAIL if `KmsKeyId` is absent (no CMK encryption for notebook storage). |
+| 124 | SageMaker notebook root access | `SageMakerNotebookRootAccess` | M | WARN if `RootAccess=Enabled` (elevated privileges in the notebook container). |
+| 125 | SageMaker endpoint no VPC | `SageMakerEndpointNoVpc` | M | `sagemaker:DescribeEndpointConfig`; WARN if no VPC config (endpoints accessible only via public API). |
+
+---
+
+## AMI checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 126 | AMI shared publicly | `AmiPublicSharing` | H | `ec2:DescribeImageAttribute` (launchPermission); FAIL any owned AMI shared with `all` (public). Potential data/IP leakage. |
+| 127 | AMI not encrypted | `AmiNotEncrypted` | M | `ec2:DescribeImages` (owner=self); WARN AMIs with unencrypted EBS snapshots as block devices. |
+
+---
+
+## Inspector checks (per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 128 | Inspector not enabled | `InspectorNotEnabled` | M | `inspector2:BatchGetAccountStatus`; FAIL if Inspector is not activated for EC2/ECR/Lambda scanning. |
+| 129 | Inspector active critical/high findings | `InspectorCriticalFindings` | H | `inspector2:ListFindings` (filter severity=CRITICAL/HIGH, state=ACTIVE); FAIL if active critical/high vulnerability findings exist — report count and top affected resources. |
+| 130 | Inspector ECR scan coverage gap | `InspectorEcrCoverageGap` | M | `inspector2:ListCoverageStatistics`; WARN if ECR repository scan coverage < 100% of active repos. |
+
+---
+
+## Security Hub checks (global + per region)
+
+| # | Requirement | Check ID(s) | Sev | How to evaluate |
+|---|---|---|---|---|
+| 131 | Security Hub not enabled | `SecurityHubNotEnabled` | H | `securityhub:DescribeHub`; FAIL if Security Hub is not enabled in the region. |
+| 132 | Security Hub no standards enabled | `SecurityHubNoStandards` | M | `securityhub:GetEnabledStandards`; WARN if no security standards subscriptions (CIS, FSBP, PCI). |
+| 133 | Security Hub critical findings unresolved | `SecurityHubCriticalFindings` | H | `securityhub:GetFindings` (filter SeverityLabel=CRITICAL, WorkflowStatus=NEW/NOTIFIED); FAIL if unresolved critical findings exist. |
+
+---
+
+## Compliance Framework Mappings — New Checks
+
+### CIS AWS Foundations Benchmark v3.0
+
+| Check ID(s) | CIS Control | CIS Section |
+|-------------|-------------|-------------|
+| `EbsVolumeNotEncrypted` | Ensure EBS volume encryption is enabled | 2.2.1 |
+| `EbsDefaultEncryptionDisabled` | Ensure EBS default encryption is enabled | 2.2.1 |
+| `EbsSnapshotPublic` | Ensure EBS snapshots are not publicly restorable | 2.2.2 |
+| `RedshiftPublicAccess` | Ensure Redshift clusters are not publicly accessible | 2.3.2 |
+
+### HIPAA
+
+| Check ID(s) | HIPAA Safeguard | Reference |
+|-------------|-----------------|-----------|
+| `EbsVolumeNotEncrypted`, `EfsNotEncrypted`, `ElastiCacheNoAtRestEncryption`, `RedshiftNotEncrypted` | Encryption at rest — ePHI protection | §164.312(a)(2)(iv) |
+| `ElastiCacheNoTransitEncryption`, `RedshiftNoRequireSsl` | Encryption in transit — ePHI transmission security | §164.312(e)(1) |
+| `SageMakerNotebookPublic`, `RedshiftPublicAccess` | Access Control — minimum necessary access | §164.502(b) |
+| `InspectorNotEnabled` | Security Management — vulnerability management | §164.308(a)(1) |
+
+### SOC 2
+
+| Check ID(s) | SOC 2 Criteria | Category |
+|-------------|----------------|----------|
+| `EbsSnapshotPublic`, `AmiPublicSharing`, `EfsPublicPolicy` | CC6.6 — Restrict external access | Security |
+| `EbsVolumeNotEncrypted`, `EfsNotEncrypted`, `RedshiftNotEncrypted` | CC6.7 — Restrict access to information assets at rest | Confidentiality |
+| `InspectorCriticalFindings` | CC7.1 — Detection of vulnerabilities | Security |
+| `SecurityHubNotEnabled` | CC7.2 — Monitoring for incident response | Security |
+
+### PCI DSS v4.0
+
+| Check ID(s) | PCI DSS Requirement | Section |
+|-------------|---------------------|---------|
+| `EbsVolumeNotEncrypted`, `EfsNotEncrypted`, `RedshiftNotEncrypted`, `ElastiCacheNoAtRestEncryption` | Protect stored cardholder data with encryption | 3.5 |
+| `ElastiCacheNoTransitEncryption`, `RedshiftNoRequireSsl` | Encrypt transmission of cardholder data | 4.1 |
+| `InspectorNotEnabled`, `InspectorCriticalFindings` | Regularly test security systems | 11.3 |
+| `SecurityHubNotEnabled` | Centralized security monitoring | 10.7 |
+
+### AWS FSBP
+
+| Check ID(s) | FSBP Control | AWS Service |
+|-------------|--------------|-------------|
+| `EbsVolumeNotEncrypted` | EC2.3 — EBS volumes should be encrypted | EC2/EBS |
+| `EbsSnapshotPublic` | EC2.1 — EBS snapshots should not be public | EC2/EBS |
+| `EbsDefaultEncryptionDisabled` | EC2.7 — EBS default encryption should be enabled | EC2/EBS |
+| `EfsNotEncrypted` | EFS.1 — EFS should be configured to encrypt data at rest | EFS |
+| `ElastiCacheNoTransitEncryption` | ElastiCache.1 — ElastiCache clusters should have encryption in transit | ElastiCache |
+| `ElastiCacheNoAtRestEncryption` | ElastiCache.2 — ElastiCache clusters should have encryption at rest | ElastiCache |
+| `RedshiftPublicAccess` | Redshift.1 — Redshift clusters should prohibit public access | Redshift |
+| `RedshiftNotEncrypted` | Redshift.10 — Redshift clusters should be encrypted at rest | Redshift |
+| `RedshiftNoAuditLogging` | Redshift.4 — Redshift clusters should have audit logging enabled | Redshift |
+| `SageMakerNotebookPublic` | SageMaker.1 — SageMaker notebook instances should not have direct internet access | SageMaker |
+| `SageMakerNotebookNotEncrypted` | SageMaker.2 — SageMaker notebook instances should be encrypted | SageMaker |
+| `InspectorNotEnabled` | Inspector.1 — Amazon Inspector should be enabled | Inspector |
+| `SecurityHubNotEnabled` | SecurityHub.1 — Security Hub should be enabled | Security Hub |
+| `AmiPublicSharing` | EC2.2 — AMIs should not be publicly shared | EC2 |
+
+---
+
 ## Scoring
 
 - **FAIL** = misconfiguration present (counts toward the risk total, weighted by severity: H=3, M=2, L=1).

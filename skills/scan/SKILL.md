@@ -47,7 +47,25 @@ If an API does not return all three, populate what is available:
   8. Container security — EKS / ECS / ECR (per region)
   9. IAM Access Analyzer external access (per region)
   10. Compute Optimizer (global)
-  11. Consolidate & score
+  11. Lambda (per region)
+  12. API Gateway (per region)
+  13. SNS / SQS (per region)
+  14. DynamoDB (per region)
+  15. CloudFront (global)
+  16. ELB / ALB / NLB (per region)
+  17. Secrets Manager (per region)
+  18. WAF (per region + global)
+  19. VPC & Networking (per region)
+  20. OpenSearch (per region)
+  21. EBS (per region)
+  22. EFS (per region)
+  23. ElastiCache (per region)
+  24. Redshift (per region)
+  25. SageMaker (per region)
+  26. AMI (per region)
+  27. Inspector (per region)
+  28. Security Hub (per region)
+  29. Consolidate & score
 
 ## Step 5: Enrich findings
 - Use `well-architected-security-mcp-server` to cross-reference findings against the Well-Architected Security Pillar. Attach WAF best-practice IDs to relevant findings.

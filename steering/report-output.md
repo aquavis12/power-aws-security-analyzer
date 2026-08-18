@@ -59,7 +59,7 @@ Each finding includes a `Compliance` field listing all frameworks violated (comm
 Map each check ID to frameworks using `steering/checks-catalog.md` § "Compliance Framework Mappings".
 
 ### Category order
-IAM → EC2/Network → S3 → RDS → KMS → Lambda → API Gateway → SNS/SQS → DynamoDB → CloudFront → ELB/ALB → Secrets Manager → WAF → VPC → OpenSearch → Containers → Detective Controls → Access Analyzer → Compute Optimizer → Trusted Advisor
+IAM → EC2/Network → EBS → S3 → RDS → KMS → Lambda → API Gateway → SNS/SQS → DynamoDB → CloudFront → ELB/ALB → Secrets Manager → WAF → VPC → OpenSearch → EFS → ElastiCache → Redshift → SageMaker → AMI → Containers → Detective Controls → Access Analyzer → Inspector → Security Hub → Compute Optimizer → Trusted Advisor
 
 ### Sorting
 Within each category: severity (H→M→L) then status (FAIL→WARN→PASS).
